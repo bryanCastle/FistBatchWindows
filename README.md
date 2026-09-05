@@ -16,19 +16,19 @@ FirstBatch turns the review process into a focused sequence: open a folder, star
 
 The welcome screen keeps the entry point simple: choose a folder and begin. No account, import workflow, or unnecessary setup.
 
-![FirstBatch welcome screen](docs/images/welcome-screen.png)
+<img src="docs/images/welcome-screen.png" alt="FirstBatch welcome screen" width="360">
 
 ### 2. Review the timeline
 
 Photos are shown together in a date-based timeline so a full shoot can be reviewed in context. Users can filter by file type or select a group when they need a batch action.
 
-![FirstBatch timeline](docs/images/timeline-screen.png)
+<img src="docs/images/timeline-screen.png" alt="FirstBatch timeline" width="360">
 
 ### 3. Make fast decisions
 
 The viewer gives the image almost the entire window. Back, forward, delete, and like are always simple to reach, while keyboard controls keep the culling process moving.
 
-![FirstBatch photo viewer](docs/images/culling-screen.png)
+<img src="docs/images/culling-screen.png" alt="FirstBatch photo viewer" width="360">
 
 ## The problem I set out to solve
 
@@ -125,3 +125,4 @@ Photos remain on the user's device. FirstBatch does not require an account and d
 ## License
 
 Copyright © Bryan Castle. All rights reserved.
+
