@@ -125,4 +125,3 @@ Photos remain on the user's device. FirstBatch does not require an account and d
 ## License
 
 Copyright © Bryan Castle. All rights reserved.
-
