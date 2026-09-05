@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="PhotoOrganizer.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="#0B0B0B"
+    KeyboardAcceleratorPlacementMode="Hidden"
+    RequestedTheme="Dark"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <Style x:Key="MinimalButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#111111" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#4A4A4A" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="20,12" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="QuietButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="10,7" />
+        </Style>
+        <Style x:Key="ActionButtonStyle" TargetType="Button" BasedOn="{StaticResource MinimalButtonStyle}">
+            <Setter Property="Width" Value="132" />
+            <Setter Property="Height" Value="72" />
+            <Setter Property="Padding" Value="12,8" />
+        </Style>
+    </Page.Resources>
+
+    <Grid x:Name="RootGrid" Background="#0B0B0B">
+        <!-- Stage 1: folder selection -->
+        <Grid x:Name="WelcomeView" Padding="32,16,32,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel MaxWidth="640" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                <Border
+                    Width="84"
+                    Height="84"
+                    Margin="0,0,0,2"
+                    HorizontalAlignment="Center"
+                    Background="#111111"
+                    BorderBrush="#4A4A4A"
+                    BorderThickness="1"
+                    CornerRadius="20">
+                    <Image
+                        Width="52"
+                        Height="52"
+                        AutomationProperties.Name="FirstBatch folder icon"
+                        Source="logo/Icons/FirstbatchHD.png"
+                        Stretch="Uniform" />
+                </Border>
+                <!-- The supplied wordmark contains generous transparent space above and below.
+                     Clipping only that empty area keeps the artwork large without crowding the controls. -->
+                <Grid
+                    Width="490"
+                    Height="126"
+                    HorizontalAlignment="Center">
+                    <Grid.Clip>
+                        <RectangleGeometry Rect="0,0,490,126" />
+                    </Grid.Clip>
+                    <Image
+                        Width="490"
+                        Height="164"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        AutomationProperties.Name="FirstBatch"
+                        Source="logo/title.png"
+                        Stretch="Uniform" />
+                </Grid>
+                <TextBlock
+                    Margin="0,-2,0,0"
+                    HorizontalAlignment="Center"
+                    FontSize="17"
+                    Foreground="#B8B8B8"
+                    Text="The simple way to sort a shoot."
+                    TextAlignment="Center" />
+                <Border Width="330" Height="1" Margin="0,1" HorizontalAlignment="Center" Background="#292929" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontSize="16"
+                    Foreground="#AFAFAF"
+                    Text="Select a folder to organize your photos by date."
+                    TextAlignment="Center"
+                    TextWrapping="WrapWholeWords" />
+                <Button
+                    Width="350"
+                    Height="58"
+                    Margin="0,6,0,0"
+                    HorizontalAlignment="Center"
+                    Click="SelectFolder_Click"
+                    Style="{StaticResource MinimalButtonStyle}">
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="16">
+                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="22" Glyph="&#xE8B7;" />
+                        <TextBlock VerticalAlignment="Center" FontSize="19" Text="Select Folder" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <StackPanel Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal" Spacing="10">
+                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Foreground="#929292" Glyph="&#xE72E;" />
+                <TextBlock Foreground="#929292" Text="Your photos stay on this device. Likes move to a folder you control." />
+            </StackPanel>
+        </Grid>
+
+        <!-- Stage 2: date timeline -->
+        <Grid x:Name="TimelineView" Padding="30,22,30,0" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="1" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid Margin="0,0,0,18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Spacing="4">
+                    <TextBlock FontSize="30" FontWeight="SemiBold" Text="Timeline" />
+                    <TextBlock x:Name="FolderPathText" Foreground="#AFAFAF" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <Button
+                    x:Name="SelectModeButton"
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Click="SelectModeButton_Click"
+                    Content="Select"
+                    Style="{StaticResource QuietButtonStyle}"
+                    ToolTipService.ToolTip="Select several pictures, then delete them or move them into a named folder" />
+                <ComboBox
+                    x:Name="TypeFilterComboBox"
+                    Grid.Column="2"
+                    Width="166"
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="Show picture type"
+                    SelectedIndex="0"
+                    SelectionChanged="TypeFilterComboBox_SelectionChanged"
+                    ToolTipService.ToolTip="Show only one picture type">
+                    <ComboBoxItem Tag="All">Show type: All</ComboBoxItem>
+                    <ComboBoxItem Tag="JPEG">JPEG</ComboBoxItem>
+                    <ComboBoxItem Tag="PNG">PNG</ComboBoxItem>
+                    <ComboBoxItem Tag="HEIC">HEIC / HEIF</ComboBoxItem>
+                    <ComboBoxItem Tag="TIFF">TIFF</ComboBoxItem>
+                    <ComboBoxItem Tag="WEBP">WebP</ComboBoxItem>
+                    <ComboBoxItem Tag="GIF">GIF</ComboBoxItem>
+                    <ComboBoxItem Tag="BMP">BMP</ComboBoxItem>
+                    <ComboBoxItem Tag="RAW">RAW</ComboBoxItem>
+                </ComboBox>
+                <Button Grid.Column="3" VerticalAlignment="Center" Click="SelectFolder_Click" Content="Open folder" Style="{StaticResource QuietButtonStyle}" ToolTipService.ToolTip="Choose a different folder (Ctrl+O)" />
+            </Grid>
+            <Border
+                x:Name="SelectionBar"
+                Grid.Row="1"
+                Margin="0,0,0,14"
+                Padding="14,10"
+                Background="#D9101010"
+                BorderBrush="#4A4A4A"
+                BorderThickness="1"
+                CornerRadius="12"
+                Visibility="Collapsed">
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="SelectionCountText" VerticalAlignment="Center" FontWeight="SemiBold" Text="Select pictures" />
+                    <Button Grid.Column="1" Click="ClearSelection_Click" Content="Clear" Style="{StaticResource QuietButtonStyle}" />
+                    <Button
+                        x:Name="DeleteSelectedButton"
+                        Grid.Column="2"
+                        Click="DeleteSelected_Click"
+                        Content="Delete"
+                        Style="{StaticResource MinimalButtonStyle}"
+                        ToolTipService.ToolTip="Move the selected pictures to the Deleted folder (Ctrl+Z undoes the whole batch)" />
+                    <Button
+                        x:Name="MoveSelectedButton"
+                        Grid.Column="3"
+                        Click="MoveSelected_Click"
+                        Content="Add to new folder"
+                        Style="{StaticResource MinimalButtonStyle}"
+                        ToolTipService.ToolTip="Move the selected pictures into a folder you name" />
+                </Grid>
+            </Border>
+            <Border Grid.Row="2" Background="#303030" />
+            <ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Enabled">
+                <Grid Padding="0,24,0,32">
+                    <StackPanel x:Name="TimelineStack" Spacing="30" />
+                    <StackPanel x:Name="EmptyTimelinePanel" MaxWidth="440" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Visibility="Collapsed">
+                        <TextBlock HorizontalAlignment="Center" FontSize="24" FontWeight="SemiBold" Text="No pictures found" />
+                        <TextBlock x:Name="EmptyTimelineText" Foreground="#AFAFAF" Text="Choose a folder containing JPG, PNG, HEIC, WebP, GIF, BMP, TIFF, or camera RAW pictures." TextAlignment="Center" TextWrapping="WrapWholeWords" />
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Stage 3: large photo view. The picture fills the frame and the chrome floats over it,
+             fading in only while the pointer is near the edge that chrome lives on. -->
+        <Grid
+            x:Name="PhotoView"
+            Padding="8"
+            PointerExited="PhotoView_PointerExited"
+            PointerMoved="PhotoView_PointerMoved"
+            Visibility="Collapsed">
+            <Grid>
+                <Border Background="#050505" CornerRadius="18">
+                    <ScrollViewer
+                        x:Name="PhotoScroller"
+                        CornerRadius="18"
+                        HorizontalScrollBarVisibility="Hidden"
+                        HorizontalScrollMode="Enabled"
+                        IsTabStop="False"
+                        MaxZoomFactor="8"
+                        MinZoomFactor="1"
+                        SizeChanged="PhotoScroller_SizeChanged"
+                        VerticalScrollBarVisibility="Hidden"
+                        VerticalScrollMode="Enabled"
+                        ZoomMode="Enabled">
+                        <!-- The transparent background makes the whole frame hit testable, so the
+                             wheel and drag handlers fire over the letterboxed area too. -->
+                        <Grid
+                            x:Name="PhotoZoomSurface"
+                            Background="Transparent"
+                            DoubleTapped="PhotoZoomSurface_DoubleTapped"
+                            PointerCaptureLost="PhotoZoomSurface_PointerReleased"
+                            PointerCanceled="PhotoZoomSurface_PointerReleased"
+                            PointerMoved="PhotoZoomSurface_PointerMoved"
+                            PointerPressed="PhotoZoomSurface_PointerPressed"
+                            PointerReleased="PhotoZoomSurface_PointerReleased"
+                            PointerWheelChanged="PhotoZoomSurface_PointerWheelChanged">
+                            <Image x:Name="PhotoImage" AutomationProperties.Name="Selected photo" ImageFailed="PhotoImage_ImageFailed" Stretch="Uniform" />
+                        </Grid>
+                    </ScrollViewer>
+                </Border>
+                <Border x:Name="RulesPanel" MaxWidth="720" Margin="24" Padding="22" HorizontalAlignment="Center" VerticalAlignment="Center" Background="#F20E0E0E" BorderBrush="#505050" BorderThickness="1" CornerRadius="18" PointerWheelChanged="RulesPanel_PointerWheelChanged">
+                    <StackPanel Spacing="16">
+                        <Grid>
+                            <TextBlock FontSize="20" FontWeight="SemiBold" Text="Rules" />
+                            <Button HorizontalAlignment="Right" AutomationProperties.Name="Close rules" Click="CloseRules_Click" Content="&#x00D7;" FontSize="22" Style="{StaticResource QuietButtonStyle}" />
+                        </Grid>
+                        <Grid ColumnSpacing="18" RowSpacing="14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="18" Glyph="&#xE787;" />
+                                <StackPanel>
+                                    <TextBlock FontWeight="SemiBold" Text="Start where you selected" />
+                                    <TextBlock Foreground="#AFAFAF" Text="Pictures follow date order." />
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="18" Glyph="&#xE72A;" />
+                                <StackPanel>
+                                    <TextBlock FontWeight="SemiBold" Text="Move one picture at a time" />
+                                    <TextBlock Foreground="#AFAFAF" Text="Arrow keys move, scroll zooms." />
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="12">
+                                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="18" Glyph="&#xEB51;" />
+                                <StackPanel>
+                                    <TextBlock FontWeight="SemiBold" Text="Like what you want to keep" />
+                                    <TextBlock Foreground="#AFAFAF" Text="Press S. It moves to Liked." />
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="18" Glyph="&#xE74D;" />
+                                <StackPanel>
+                                    <TextBlock FontWeight="SemiBold" Text="Delete safely" />
+                                    <TextBlock Foreground="#AFAFAF" Text="Press D. Ctrl+Z undoes." />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                        <TextBlock Foreground="#AFAFAF" Text="The title and buttons stay out of the way. Move the pointer to the top or bottom edge to bring them back." TextWrapping="WrapWholeWords" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Both bars collapse rather than merely fading to transparent, so while hidden they
+                 stay out of the tab order and never intercept the wheel over the picture. -->
+            <Border
+                x:Name="TopChrome"
+                Margin="14"
+                Padding="12,8"
+                VerticalAlignment="Top"
+                Background="#D9101010"
+                BorderBrush="#4A4A4A"
+                BorderThickness="1"
+                CornerRadius="14"
+                Opacity="0"
+                Visibility="Collapsed">
+                <Grid ColumnSpacing="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Button Click="ReturnToTimeline_Click" Style="{StaticResource QuietButtonStyle}" ToolTipService.ToolTip="Return to the timeline (Esc)">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="15" Glyph="&#xE72B;" />
+                            <TextBlock Text="Timeline" />
+                        </StackPanel>
+                    </Button>
+                    <TextBlock x:Name="PhotoNameText" Grid.Column="1" VerticalAlignment="Center" FontWeight="SemiBold" TextAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <TextBlock x:Name="PhotoPositionText" Grid.Column="2" Margin="0,0,6,0" VerticalAlignment="Center" Foreground="#AFAFAF" />
+                </Grid>
+            </Border>
+            <Border
+                x:Name="BottomChrome"
+                Margin="0,0,0,20"
+                Padding="14"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Background="#D9101010"
+                BorderBrush="#4A4A4A"
+                BorderThickness="1"
+                CornerRadius="18"
+                Opacity="0"
+                Visibility="Collapsed">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Button x:Name="BackButton" AutomationProperties.Name="Previous picture" Click="BackButton_Click" Style="{StaticResource ActionButtonStyle}" ToolTipService.ToolTip="Previous picture (Left arrow)">
+                        <StackPanel Spacing="5">
+                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="24" Glyph="&#xE72B;" />
+                            <TextBlock HorizontalAlignment="Center" Text="Back" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="ForwardButton" AutomationProperties.Name="Next picture" Click="ForwardButton_Click" Style="{StaticResource ActionButtonStyle}" ToolTipService.ToolTip="Next picture (Right arrow)">
+                        <StackPanel Spacing="5">
+                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="24" Glyph="&#xE72A;" />
+                            <TextBlock HorizontalAlignment="Center" Text="Forward" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="DeleteButton" AutomationProperties.Name="Delete picture" Click="DeleteButton_Click" Style="{StaticResource ActionButtonStyle}" ToolTipService.ToolTip="Move this picture to the Deleted folder — press D (Ctrl+Z undoes)">
+                        <StackPanel Spacing="5">
+                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="23" Glyph="&#xE74D;" />
+                            <TextBlock HorizontalAlignment="Center" Text="Delete" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="LikeButton" AutomationProperties.Name="Like picture" Click="LikeButton_Click" Style="{StaticResource ActionButtonStyle}" ToolTipService.ToolTip="Move this picture into the Liked folder — press S (Ctrl+Z undoes)">
+                        <StackPanel Spacing="5">
+                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="23" Glyph="&#xEB51;" />
+                            <TextBlock HorizontalAlignment="Center" Text="Like" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Pushed clear of the floating title bar so a status message never lands on top of it. -->
+        <Border x:Name="StatusBanner" Margin="20,86,20,20" Padding="16,10" HorizontalAlignment="Center" VerticalAlignment="Top" Background="#F21A1A1A" BorderBrush="#5A5A5A" BorderThickness="1" CornerRadius="10" IsHitTestVisible="False" Visibility="Collapsed">
+            <TextBlock x:Name="StatusText" TextWrapping="Wrap" />
+        </Border>
+        <Grid x:Name="LoadingOverlay" Background="#D90B0B0B" Visibility="Collapsed">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
+                <ProgressRing Width="38" Height="38" Foreground="White" IsActive="True" />
+                <TextBlock x:Name="LoadingText" HorizontalAlignment="Center" Text="Loading pictures…" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>
