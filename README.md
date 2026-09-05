@@ -4,7 +4,9 @@
 
 FirstBatch is a minimal Windows app for choosing the winners from a large photo shootquickly, locally, and without breaking creative flow.
 
-Check out FirstBatch Creative Concept Page https://firstbatch-rho.vercel.app/
+Get it for the Microsoft Store here: https://apps.microsoft.com/detail/9PL9MVN51JQS?hl=en-us&gl=US&ocid=pdpshare
+
+Check out FirstBatch Creative Concept Page: https://firstbatch-rho.vercel.app/
 
 I am a software engineer and part-time photographer. I built FirstBatch after repeatedly running into the same problem: most photo-culling tools either lock useful workflow features behind a paywall or surround a simple task with cluttered screens, menus, and interruptions. Neither fit the way I wanted to work after a shoot.
 
